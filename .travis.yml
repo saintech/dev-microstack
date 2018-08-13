@@ -7,7 +7,7 @@ env:
   global:
     - DOCKERFILE=$'
       FROM smashwilson/lets-nginx\n
-      COPY /templates /templates'
+      COPY /nginx /nginx'
 
 before_install:
   - echo "$DOCKERFILE" > Dockerfile
@@ -15,5 +15,5 @@ before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 script:
-  - docker build -t saintech/dev-microstack-nginx:$COMMIT .
-  - docker push saintech/dev-microstack-nginx:$COMMIT
+  - docker build -t saintech/dev-microstack-nginx .
+  - docker push saintech/dev-microstack-nginx
