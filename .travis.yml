@@ -5,11 +5,10 @@ services:
 
 env:
   DOCKERFILE: |-
-    FROM smashwilson/lets-nginx
-    COPY /templates /templates
+    "FROM smashwilson/lets-nginx
+    COPY /templates /templates"
 
 before_install:
-  - echo "$DOCKERFILE"
   - echo "$DOCKERFILE" > Dockerfile
   - echo "$(cat Dockerfile)"
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
