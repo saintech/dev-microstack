@@ -42,6 +42,7 @@ services:
       - DRONE_HOST=https://ci.${DOMAIN}
       - DRONE_SECRET
       - DRONE_ADMIN
+      - DRONE_OPEN
       - DRONE_ORGS
       
       - DRONE_GITHUB
