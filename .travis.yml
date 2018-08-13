@@ -9,6 +9,7 @@ env:
     COPY /templates /templates
 
 before_install:
+  - echo "$DOCKERFILE"
   - echo "$DOCKERFILE" > Dockerfile
   - echo "$(cat Dockerfile)"
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
