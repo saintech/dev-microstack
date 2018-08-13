@@ -7,7 +7,7 @@ env:
   global:
     - DOCKERFILE=$'
       FROM smashwilson/lets-nginx\n
-      COPY /lets-nginx /lets-nginx'
+      COPY /lets-nginx /templates'
 
 before_install:
   - echo "$DOCKERFILE" > Dockerfile
