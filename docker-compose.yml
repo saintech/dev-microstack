@@ -1,0 +1,115 @@
+version: "2.3"
+services:
+
+  nginx:
+    image: registry.${DOMAIN}/nginx
+    restart: always
+    ports: ["80:80", "443:443"]
+    volumes:
+      - nginx-certs:/etc/letsencrypt
+      - htpasswd:/etc/htpasswd:ro
+      - letsencrypt:/var/lib/letsencrypt
+      - frontend:/usr/share/nginx/html:ro
+      - /cache
+    environment:
+      - DOMAIN=dev.${DOMAIN};api.${DOMAIN};ci.${DOMAIN};registry.${DOMAIN};docker.${DOMAIN}
+      - UPSTREAM=0.0.0.0;127.0.0.1;drone-server:8000;registry:5000;portainer:9000
+      - EMAIL=${LETSENCRYPT_EMAIL}
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+  portainer:
+    image: portainer/portainer
+    restart: always
+    volumes:
+      - portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -H unix:///var/run/docker.sock
+
+  registry:
+    image: registry:2
+    restart: always
+    volumes:
+      - registry:/var/lib/registry
+      
+  drone-server:
+    image: drone/drone:0.8
+    restart: always
+    volumes:
+      - drone-server:/var/lib/drone/
+    environment:
+    
+      - DRONE_HOST=https://ci.${DOMAIN}
+      - DRONE_SECRET
+      - DRONE_ADMIN
+      - DRONE_ORGS
+      
+      - DRONE_GITHUB
+      - DRONE_GITHUB_CLIENT
+      - DRONE_GITHUB_SECRET
+      
+      - DRONE_GITLAB
+      - DRONE_GITLAB_CLIENT
+      - DRONE_GITLAB_SECRET
+      - DRONE_GITLAB_URL
+      
+      - DRONE_GITEA
+      - DRONE_GITEA_URL
+      
+      - DRONE_GOGS
+      - DRONE_GOGS_URL
+      
+      - DRONE_BITBUCKET
+      - DRONE_BITBUCKET_CLIENT
+      - DRONE_BITBUCKET_SECRET
+      
+      - DRONE_CODING
+      - DRONE_CODING_CLIENT
+      - DRONE_CODING_SECRET
+  
+  drone-agent:
+    image: drone/agent:0.8
+    restart: always
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=drone-server:9000
+      - DRONE_SECRET
+    command: agent
+
+  watchtower:
+    image: v2tec/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /Users/Kirill/.docker/config.json:/config.json
+    environment:
+      - REPO_USER=automate
+      - REPO_PASS=${AUTOMATE_REPO_PASS}
+      - WATCHTOWER_POLL_INTERVAL=32
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=true
+
+  support:
+    image: joffotron/docker-net-tools
+    stdin_open: true
+    tty: true
+    volumes:
+      - nginx-certs:/etc/letsencrypt
+      - htpasswd:/etc/htpasswd
+      - letsencrypt:/var/lib/letsencrypt
+      - frontend:/usr/share/nginx/html
+      - portainer:/portainer_data
+      - registry:/var/lib/registry
+      - drone-server:/var/lib/drone/
+
+volumes:
+  nginx-certs:
+  htpasswd:
+  letsencrypt:
+  frontend:
+  portainer:
+  registry:
+  drone-server:
