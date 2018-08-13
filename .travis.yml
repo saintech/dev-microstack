@@ -4,7 +4,7 @@ services:
   - docker
 
 env:
-  - DOCKERFILE = $'
+  - DOCKERFILE=$'
     FROM smashwilson/lets-nginx\n
     COPY /templates /templates'
 
