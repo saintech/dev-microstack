@@ -1,5 +1,7 @@
 # dev-microstack
 
+[![Build Status](https://travis-ci.org/saintech/dev-microstack.svg?branch=master)](https://travis-ci.org/saintech/dev-microstack)
+
 :construction: **currently in early state** :construction:
 
 ## Prerequisites
