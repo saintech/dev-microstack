@@ -1,0 +1,34 @@
+pipeline:
+
+  test:
+    image: smashwilson/lets-nginx
+    environment:
+      DOMAIN: test
+      UPSTREAM: 0.0.0.0
+      DOCKERFILE: |-
+        FROM smashwilson/lets-nginx
+        COPY /templates /templates
+    commands:
+      - mkdir -p /drone/src/nginx/vhosts /etc/letsencrypt/live/test
+      - (cd /etc/letsencrypt/live/test && openssl req -x509 -nodes -subj '/CN=localhost' -keyout privkey.pem -out fullchain.pem)
+      - (cd /etc/letsencrypt/live/test && cp fullchain.pem chain.pem)
+      - openssl dhparam -out /etc/ssl/dhparams.pem 2
+      - PATH=test /usr/local/bin/envsubst '$$DOMAIN $$UPSTREAM $$PATH' < templates/vhost.sample.conf > /drone/src/nginx/vhosts/test.conf
+      - echo "$(cat /drone/src/nginx/vhosts/test.conf)"
+      - cp templates/nginx.conf /drone/src/nginx/nginx.conf
+      - nginx -t -p /drone/src/nginx/ -c nginx.conf
+      - echo "$DOCKERFILE" > Dockerfile
+      - echo "$(cat Dockerfile)"
+
+  gixy-test:
+    image: yandex/gixy
+    commands:
+      - gixy /drone/src/nginx/nginx.conf
+
+  publish:
+    image: plugins/docker
+    registry: registry.${CI_SYSTEM_HOST#ci.}
+    username: automate
+    secrets: [ docker_password ]
+    repo: registry.${CI_SYSTEM_HOST#ci.}/nginx
+    tags: [ latest, "${DRONE_COMMIT_SHA:0:7}" ]
