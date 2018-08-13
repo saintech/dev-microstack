@@ -28,8 +28,8 @@ export DRONE_SECRET=$(</dev/urandom tr -dc A-Za-z0-9-_ | head -c 16)
 
 docker pull saintech/dev-microstack-nginx
 docker tag saintech/dev-microstack-nginx registry.${DOMAIN}/nginx
-docker-compose run --rm --entrypoint htpasswd -v devops_htpasswd:/etc/htpasswd registry -Bcb /etc/htpasswd/.htpasswd automate ${AUTOMATE_REPO_PASS}
-docker-compose run --rm --entrypoint htpasswd -v devops_htpasswd:/etc/htpasswd registry -B /etc/htpasswd/.htpasswd ${DRONE_ADMIN}
+wget -q -O- https://github.com/saintech/dev-microstack/raw/master/docker-compose.yml | docker-compose -f - run --rm --entrypoint htpasswd -v devops_htpasswd:/etc/htpasswd registry -Bcb /etc/htpasswd/.htpasswd automate ${AUTOMATE_REPO_PASS}
+wget -q -O- https://github.com/saintech/dev-microstack/raw/master/docker-compose.yml | docker-compose -f - run --rm --entrypoint htpasswd -v devops_htpasswd:/etc/htpasswd registry -B /etc/htpasswd/.htpasswd ${DRONE_ADMIN}
 wget -q -O- https://github.com/saintech/dev-microstack/raw/master/docker-compose.yml | docker-compose -f - up -d
 docker-compose logs -f
 ```
