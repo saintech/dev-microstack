@@ -4,9 +4,9 @@ services:
   - docker
 
 env:
-  - DOCKERFILE: |-
-      FROM smashwilson/lets-nginx
-      COPY /templates /templates
+  - DOCKERFILE = $'
+    FROM smashwilson/lets-nginx\n
+    COPY /templates /templates'
 
 before_install:
   - echo "$DOCKERFILE" > Dockerfile
